@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="Notes">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/Notes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/websvc.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

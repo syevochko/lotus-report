@@ -1,0 +1,9 @@
+*.class
+/bin
+/out
+/target
+/.settings
+.project
+.classpath
+*_audit.txt
+*/target
