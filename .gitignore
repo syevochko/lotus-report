@@ -7,3 +7,5 @@
 .classpath
 *_audit.txt
 */target
+.idea/
+*.iml
