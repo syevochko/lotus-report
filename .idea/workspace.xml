@@ -1,61 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="28020bf5-d2af-4d14-a2f1-c1fe783f6949" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/req/AdminRequest.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/CrfunCsvDashboard.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/InternalException.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/JDate.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LD2BOW.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/ws/LNCGI.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNDbLogEntry.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNDbLogSingle.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorA.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorDbDirectory.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorDocumentA.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorDocumentCollection.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorEntryA.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorVector.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorViewEntryCollection.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/iterators/LNIteratorViewNavigator.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNLogWriter.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNPAB.java" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LogEx.java" />
-      <change type="DELETED" beforePath="D:\Repos\lotus-report\.idea\libraries\Notes.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/AbstructFileReportBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/AbstructFileReportBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/util/Base64Java.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/util/Base64Java.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/EmployeeInfo.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/EmployeeInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/util/HttpClientWrapper.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/util/HttpClientWrapper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNAccess.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNAccess.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNAddressBook.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNAddressBook.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentBase.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentCSVFile.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentCSVFile.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentCSVFileBase.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNAgentCSVFileBase.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNDbLog.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNDbLog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNEnvironment.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/LNEnvironment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNHTTPAgent.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNHTTPAgent.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/LNIterator.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/LNIterator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNLog.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/LNLog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/LNObjectList.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/LNObjectList.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNWSClient.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNWSClient.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNWSClient_woHTTP.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/LNWSClient_woHTTP.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/MultiUserFileReportBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/MultiUserFileReportBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/util/MyURLConnection.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/util/MyURLConnection.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/ParamAgentLauncher.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/ParamAgentLauncher.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/util/SSLURLAction.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/util/SSLURLAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/SingleFileReportBuilder.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/report/SingleFileReportBuilder.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/TimerInfo.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/agents/TimerInfo.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/Tools.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/utils/Tools.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/util/URLAction.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/util/URLAction.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/ws/WCResponse.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/ws/WCResponse.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/XSPLNDbLog.java" afterPath="$PROJECT_DIR$/src/main/java/com/fuib/lotus/log/XSPLNDbLog.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/encodings.xml" afterPath="$PROJECT_DIR$/.idea/encodings.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/misc.xml" afterPath="$PROJECT_DIR$/.idea/misc.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/report-crfun.iml" afterPath="$PROJECT_DIR$/report-crfun.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="28020bf5-d2af-4d14-a2f1-c1fe783f6949" name="Default" comment="" />
     <ignored path="report-crfun.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -618,7 +564,7 @@
       <updated>1492889819081</updated>
       <workItem from="1492889833169" duration="2359000" />
       <workItem from="1493239223414" duration="2461000" />
-      <workItem from="1493246088950" duration="455000" />
+      <workItem from="1493246088950" duration="662000" />
     </task>
     <task id="LOCAL-00001" summary="fix gitignore">
       <created>1492891521779</created>
@@ -630,7 +576,7 @@
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="5275000" />
+    <option name="totallyTimeSpent" value="5482000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="0" width="1378" height="744" extended-state="0" />
@@ -643,7 +589,7 @@
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25037935" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.5980392" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.5980392" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.22837633" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
