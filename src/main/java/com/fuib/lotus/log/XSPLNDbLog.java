@@ -12,11 +12,15 @@ public class XSPLNDbLog {
 	protected LNDbLog m_log = null;
 	
 	// --- constructors ---
-	public XSPLNDbLog(String sCategory) 					{ m_log = new LNDbLog(sCategory); }
-	public XSPLNDbLog(String sCategory, String sModule)		{ m_log = new LNDbLog(sCategory, sModule); }
+	public XSPLNDbLog(String sLogCategory, String sModuleName, int iLogType) {
+		if (iLogType == LNDbLog.LOGTYPE_ENTRY)
+			m_log = new LNDbLogEntry(sLogCategory, sModuleName);
+		else
+			m_log = new LNDbLogSingle(sLogCategory, sModuleName);
+	}
 	
 	// methods from LNDbLog
-	public boolean open(Database db, int nLogType) throws Exception 	{ return m_log.open(db, nLogType); }
+	public boolean open(Database db) throws Exception				 	{ return m_log.open(db); }
 	public void close() throws IOException 								{ m_log.close(); }
 	public void log(String sMsg) throws Exception 						{ m_log.log(sMsg); }
 	public void logError(int nErr, String sMsg) throws Exception 		{ m_log.logError(nErr, sMsg); }

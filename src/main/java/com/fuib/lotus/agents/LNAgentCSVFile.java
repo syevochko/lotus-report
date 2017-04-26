@@ -10,13 +10,13 @@ import java.io.Writer;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Vector;
 
 import com.fuib.lotus.LNEnvironment;
 import com.fuib.lotus.log.LNDbLog;
 import com.fuib.lotus.utils.LNIterator;
+import com.fuib.lotus.utils.Tools;
 
 import lotus.domino.Database;
 import lotus.domino.DateTime;
@@ -30,9 +30,7 @@ import lotus.domino.RichTextItem;
  * Реализация выгрузки данных в csv-файл в формате, заданном в параметрах профиля агента в базе "Конфигурация АС: Lotus"
  * @author evochko * 
  */
-@Deprecated
 public class LNAgentCSVFile extends LNWSClient_woHTTP {
-
 	protected final String PARAM_FILE_PREFIX = "FILE_NAME_PREFIX";
 	protected final String PARAM_SELECTION_FORMULA = "SELECTION_FORMULA";
 	protected final String PARAM_COL_PREFIX = "COL";
@@ -40,9 +38,7 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	protected final String PARAM_DBTRG_PATH = "DBTRG_PATH";
 	
 	protected final int ERR_REQUIRED_PARAM = 1900;
-	protected final int ERR_NOT_NOTES = 1999;
-	protected final String ERR_NOTIFY_LIST = "APP.Developers";
-
+	
 	protected final int MAX_COL_COUNT = 50;
 	protected final String COL_SEP = ";";
 	protected final String VALUE_SEP = ",";
@@ -61,8 +57,8 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 		oColsDoubleFormatter = new DecimalFormat("", dfs);
 		oColsDoubleFormatter.setGroupingUsed(false);
 	}
-
-	private Vector vColumns = new Vector();
+	
+	private Vector<ColumValueWrapper> vColumns = new Vector<ColumValueWrapper>();
 	
 	/**
 	 * <br> Класс-обертка для обращения к свойствам колонки-параметра.
@@ -76,14 +72,14 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 		private boolean bHasSqlNullIfEmpty = false;
 		private String sColValue = "";
 		private String sColDescription = "";
-
+		
 		public ColumValueWrapper(boolean isFormula, boolean bHasSqlNull, String columnValue, String columnDescr) {			
 			bIsFormula = isFormula;
 			sColValue = columnValue;
 			bHasSqlNullIfEmpty = bHasSqlNull;			
 			setColDescription(columnDescr);
 		}
-
+		
 		public boolean isFormula() { return bIsFormula; }
 		public void setIsFormula(boolean isFormula) { bIsFormula = isFormula; }
 		public boolean isHasSqlNullIfEmpty() { return bHasSqlNullIfEmpty; }
@@ -93,8 +89,8 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 		public void setColDescription(String sColDescription) { this.sColDescription = sColDescription; }
 		public String getColDescription() { return sColDescription!=null?sColDescription:""; }
 	}
-
-	public LNAgentCSVFile() 		{
+	
+	public LNAgentCSVFile() {
 		setProfileForm("AgentConfig");		// установить имя формы профиля - используется как часть ключа для поиска настроечного документа
 	}
 
@@ -108,60 +104,35 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	 *  
 	 */	
 	protected void main() throws Exception, Throwable {
-
 		DocumentCollection dc = null;
 
 		try {		
-
-			this.m_env = new LNEnvironment(this.m_session);
 			this.loadConfiguration();
-			initCustomLog();
+			
+			setCustomLog(LNDbLog.LOGTYPE_ENTRY, m_mapConfig.get(ITEM_LOGEXPIRED));
 			
 			dc = getSelectionCollection();
 			logAction(m_sAgName + ": найдено " + dc.getCount() + " документов по критерию " + (String) m_mapConfig.get(PARAM_SELECTION_FORMULA) );
 			
-			if (dc.getCount()>0)	{
+			if (dc.getCount() > 0) {
 				File fileCsv = processCollection2Csv(dc);
 				logAction(m_sAgName + ": сформирован временный файл: " + fileCsv.getAbsolutePath());
 				createdDocWithCsvFile(fileCsv);
-				logAction(m_sAgName + ": сформирован документ с файлом ("+fileCsv.getName()+") в базе " + (String) m_mapConfig.get(PARAM_DBTRG_PATH) );
+				logAction(m_sAgName + ": сформирован документ с файлом (" + fileCsv.getName() + ") в базе " + (String) m_mapConfig.get(PARAM_DBTRG_PATH) );
 				fileCsv.delete();
 			}
-
-		} catch (NotesException ne)	{
-			logError(ne.id, ne.toString(), true);
-			ne.printStackTrace();
+		}
+		catch (NotesException ne) {
 			if (ne.id == ERR_REQUIRED_PARAM)
 				showRequiredParams();
-
-		} catch (Throwable ex) {
-			logError(ERR_NOT_NOTES, ex.toString(), true);
-			ex.printStackTrace();
-
-		} finally	{
-
-			if (dc!=null)
-				dc.recycle();
-			
-			if (dbTrg!=null)
-				dbTrg.recycle();
-			
+			throw ne;
 		}
-
+		finally {
+			Tools.recycleObj(dc);
+			Tools.recycleObj(dbTrg);
+		}
 	}
 	
-	protected void logError(int nErr, String sText, boolean bSendNotify) throws Exception {
-		super.logError(nErr, sText);
-		
-		if (bSendNotify)	{
-			Vector vTo = new Vector(Arrays.asList(ERR_NOTIFY_LIST.split(",")));
-			String sServer = (String) m_session.evaluate("@Name([CN]; '"+m_dbCurrent.getServer()+"')").firstElement();
-			String sSubject = "["+sServer+"] Внимание! Произошла ошибка при работе агента " + m_sAgName + " в базе " + m_dbCurrent.getFilePath();
-			String sText1 = "Произошла ошибка:\r Код: " + nErr + "\r описание: " + sText + "\r Подробности см: notes://" + sServer + "/log.nsf" ;
-			sendMail(vTo, "", sSubject, sText1, true, null, false);
-		}
-	}
-
 	/**
 	 * отображение необходимых параметров и их расшифровка
 	 */
@@ -184,26 +155,23 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	 */
 	protected void loadConfiguration() throws Exception {
 		super.loadConfiguration();
-
+		
 		if (!m_mapConfig.containsKey(PARAM_FILE_PREFIX))
-			throw new NotesException(ERR_REQUIRED_PARAM, "Expected parameter <"+PARAM_FILE_PREFIX+"> in agent profile!");
-
+			throw new NotesException(ERR_REQUIRED_PARAM, "Expected parameter <" + PARAM_FILE_PREFIX + "> in agent profile!");
+		
 		if (!m_mapConfig.containsKey(PARAM_DBTRG_PATH))
-			throw new NotesException(ERR_REQUIRED_PARAM, "Expected parameter <"+PARAM_DBTRG_PATH+"> in agent profile!");
+			throw new NotesException(ERR_REQUIRED_PARAM, "Expected parameter <" + PARAM_DBTRG_PATH + "> in agent profile!");
 		
 		dbTrg = m_env.getDatabase((String)m_mapConfig.get(PARAM_DBTRG_PATH));
-		if (dbTrg==null)
-			throw new NotesException(LNEnvironment.ERR_CUSTOM, "Can't open database by path: " + (String)m_mapConfig.get(PARAM_DBTRG_PATH) );
 		
-		if ( !m_mapConfig.containsKey(PARAM_SELECTION_FORMULA) )
+		if (!m_mapConfig.containsKey(PARAM_SELECTION_FORMULA))
 			throw new NotesException(ERR_REQUIRED_PARAM, "Expected parameter <"+PARAM_SELECTION_FORMULA+"> in agent profile!");	
-
-		if ( !m_mapConfig.containsKey(PARAM_COL_PREFIX+"1") )
+		
+		if (!m_mapConfig.containsKey(PARAM_COL_PREFIX + "1"))
 			throw new NotesException(ERR_REQUIRED_PARAM, "Expected at least one parameter-column <"+PARAM_COL_PREFIX+"1> in agent profile!");
-
 		
 		String sColsHasSqlNull = "";
-		if (m_mapConfig.containsKey(PARAM_COLS_HAS_SQLNULL))	{
+		if (m_mapConfig.containsKey(PARAM_COLS_HAS_SQLNULL)) {
 			sColsHasSqlNull = (String)m_mapConfig.get(PARAM_COLS_HAS_SQLNULL);
 			sColsHasSqlNull += "-";		// добавляем символ - не цифру, для того чтобы в дальнейшем не усложнять регулярное выражение для проверки вхождения колонки в список
 		}		
@@ -225,37 +193,22 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 			boolean bIsFormula = sColumnVal.startsWith("@", 0) && (sColumnVal.length()>1);
 			if (bIsFormula) sColumnVal = sColumnVal.substring(1, sColumnVal.length());
 			
-			vColumns.add(new ColumValueWrapper(bIsFormula, bHasSqlNullIfEmpty, sColumnVal, sColDescr) );
+			vColumns.add(new ColumValueWrapper(bIsFormula, bHasSqlNullIfEmpty, sColumnVal, sColDescr));
 		}
 		
 	}
-	
-	/**
-	 * инициализация подсистемы логирования
-	 */
-	protected void initCustomLog() throws NotesException, Exception	{
-		if ( m_sLogCategory != null ) {
-			LNDbLog log = new LNDbLog(m_sLogCategory);
 
-			log.open((m_sLogDb != null)?m_env.getDatabase(m_sLogDb):m_dbCurrent, LNDbLog.LOGTYPE_APPEND);
-			log.setProperty(LNDbLog.PROP_EXPIRED, m_mapConfig.get(ITEM_LOGEXPIRED));
-
-			setCustomLog(log);
-		}
-
-		setLogOption(true, (m_sLogCategory!=null && m_sLogDb != null), false, false);
-	}
 
 	/**
 	 * получение коллекции документов для обработки по заданному критерию поиска
 	 */
 	protected DocumentCollection getSelectionCollection() throws NotesException	{
-		DocumentCollection dc = m_dbCurrent.search( ((String) m_mapConfig.get(PARAM_SELECTION_FORMULA)) );
+		DocumentCollection dc = m_dbCurrent.search(((String) m_mapConfig.get(PARAM_SELECTION_FORMULA)));
 		return dc;
 	}
 
-	protected DocumentCollection getSelectionCollection(Database dbTrg, DateTime cutoff) throws NotesException	{
-		DocumentCollection dc = dbTrg.search( ((String) m_mapConfig.get(PARAM_SELECTION_FORMULA)), cutoff );
+	protected DocumentCollection getSelectionCollection(Database dbTrg, DateTime cutoff) throws NotesException {
+		DocumentCollection dc = dbTrg.search(((String) m_mapConfig.get(PARAM_SELECTION_FORMULA)), cutoff);
 		return dc;
 	}
 
@@ -265,11 +218,11 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	 * @throws IOException 
 	 * @throws NotesException 
 	 */
-	protected File processCollection2Csv(DocumentCollection dc) throws IOException, NotesException   {
+	protected File processCollection2Csv(DocumentCollection dc) throws IOException, NotesException {
 
 		try {
-			if (dc.getCount()==0)
-				return null;			
+			if (dc.getCount() == 0)
+				return null;
 		} catch (NotesException e) {
 			e.printStackTrace();
 			return null;
@@ -277,21 +230,21 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 
 		File res = null;
 		res = createCsvFileName();
-		Writer writer = new BufferedWriter(new OutputStreamWriter( new FileOutputStream(res) ));
+		Writer writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(res)));
 		
 		try {
 			writer = new FileWriter(res);
-			for (LNIterator dcIterator = new LNIterator(dc,true); dcIterator.hasNext(); )		{
+			for (LNIterator dcIterator = new LNIterator(dc, true); dcIterator.hasNext(); ) {
 				Document doc = (Document)dcIterator.next();
-				if (doc.isValid() && !doc.isDeleted())		{
+				if (doc.isValid() && !doc.isDeleted()) {
 					String str4csv = createCsvStrFromDoc(doc);
 					writer.write(str4csv + FILE_LINE_SEP);
 				}
 			}
-
-		} finally	{			
+		}
+		finally {			
 			try {
-				if (writer!=null)
+				if (writer != null)
 					writer.close();
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -309,18 +262,18 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	 * @see #processDocColumn()
 	 * 
 	 */
-	protected String createCsvStrFromDoc(Document doc) throws NotesException		{
+	protected String createCsvStrFromDoc(Document doc) throws NotesException {
 		StringBuffer strBuff = new StringBuffer();
 
-		for(int i=0; i < vColumns.size(); i++)	{
-			String sColValue = processDocColumn(doc, (ColumValueWrapper)vColumns.get(i));
+		for(int i=0; i < vColumns.size(); i++) {
+			String sColValue = processDocColumn(doc, vColumns.get(i));
 			strBuff.append(sColValue).append(COL_SEP);
 		}
 		strBuff.setLength(strBuff.length()-COL_SEP.length());
 		return strBuff.toString();
 	}
-
-	protected Vector getReportColumns() {
+	
+	protected Vector<ColumValueWrapper> getReportColumns() {
 		return vColumns;
 	}
 
@@ -331,21 +284,20 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 	 * @return строка, содержащая значение колонки в документе. Мульти-значения преобразуются в одну строку с разделителем VALUE_SEP
 	 * @throws NotesException 
 	 */
-	protected String processDocColumn(Document doc, ColumValueWrapper col) throws NotesException 		{
+	@SuppressWarnings("unchecked")
+	protected String processDocColumn(Document doc, ColumValueWrapper col) throws NotesException {
 		String sResult = "";
-		Vector v = null;
+		Vector<Object> v = null;
 		
 		try	{
-
 			StringBuffer sb = new StringBuffer();
 			
 			if (col.isFormula())
 				v = m_session.evaluate(col.getColumnValue(), doc);
 			else if ( doc.hasItem(col.getColumnValue()) )
 				v = doc.getItemValue(col.getColumnValue());				
-
-			if (v!=null && !v.isEmpty())	{
-				
+			
+			if (v != null && !v.isEmpty()) {
 				for(int i=0; i<v.size(); i++)	{
 					if (v.get(i) instanceof String)
 						sb.append( (String)v.get(i) );
@@ -363,44 +315,38 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 			
 			if (sResult.length()==0 && col.isHasSqlNullIfEmpty())
 				sResult = SQL_NULL;
-			
-			
-		} catch (NotesException e) {
-			
+		}
+		catch (NotesException e) {
 			throw new NotesException(e.id, e.toString() + " (process unid: "+doc.getUniversalID()+")");
-
-		} finally	{
-
-		}		
-
+		}
+		finally {}		
+		
 		return normalizeString(sResult);
 	}
-
+	
 	/**
 	 * замена недопустимых символов в строке - нормализация строки   
 	 */
-	protected String normalizeString( String sInput )	{
-		return sInput.replaceAll( "["+COL_SEP+"\\r\\n]", " ");
-	}	
-
+	protected String normalizeString(String sInput) {
+		return sInput.replaceAll("[" + COL_SEP + "\\r\\n]", " ");
+	}
+	
 	/**
 	 * получение полного имени csv-файла  
 	 */
-	protected File createCsvFileName()	{
+	protected File createCsvFileName() {
 		String sFileName = m_mapConfig.get(PARAM_FILE_PREFIX) + oFileNameFormatter.format(new Date()) + ".csv";
 		File fileCsv = new File(System.getProperty("java.io.tmpdir"), sFileName);
 		return fileCsv;
 	}
-
+	
 	/**
 	 * Создание документа в базе (dbTrg, параметр PARAM_DBTRG_PATH в профиле), 
 	 * <br> добавление сформированного файла в документ
 	 */
-	protected void createdDocWithCsvFile( File fileCsv ) throws NotesException 	{
-		
+	protected void createdDocWithCsvFile(File fileCsv) throws NotesException {
 		Document docFile = null;
 		RichTextItem rtItem = null; 
-			
 		try	{
 			docFile = dbTrg.createDocument();
 			rtItem = docFile.createRichTextItem("Body");			
@@ -412,15 +358,13 @@ public class LNAgentCSVFile extends LNWSClient_woHTTP {
 			
 			rtItem.embedObject(EmbeddedObject.EMBED_ATTACHMENT, "", fileCsv.getAbsolutePath(), "");
 			docFile.save(true, true);
-			
-		} catch(NotesException ne)	{
+		}
+		catch(NotesException ne)	{
 			throw new NotesException(LNEnvironment.ERR_CUSTOM, "Error while create doc in " + dbTrg.getFilePath() + " to attach file.");
-			
-		} finally	{
-			if (rtItem!=null)
-				rtItem.recycle();
-			if (docFile!=null)
-				docFile.recycle();
+		}
+		finally	{
+			Tools.recycleObj(rtItem);
+			Tools.recycleObj(docFile);
 		}
 	}
 	

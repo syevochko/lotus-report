@@ -75,23 +75,17 @@ public class WCResponse {
 	}
 	
 	public String Decode(String sTxt) throws UnsupportedEncodingException	{
-		if ( System.getProperty("java.version").startsWith("1.3") || System.getProperty("java.version").startsWith("1.2") || System.getProperty("java.version").startsWith("1.1"))
-			return URLDecoder.decode(sTxt);
-		else
-			return URLDecoder.decode(sTxt, DEFAULT_CHARSET);
+		return URLDecoder.decode(sTxt, DEFAULT_CHARSET);
 	}
 	
 	public String Encode(String sTxt) throws UnsupportedEncodingException 	{
-		if ( System.getProperty("java.version").startsWith("1.3") || System.getProperty("java.version").startsWith("1.2") || System.getProperty("java.version").startsWith("1.1"))
-			return URLEncoder.encode(sTxt);
-		else
-			return URLEncoder.encode(sTxt, DEFAULT_CHARSET);
+		return URLEncoder.encode(sTxt, DEFAULT_CHARSET);
 	}
 	
 	public String GetResult() throws UnsupportedEncodingException {
 		String result = (m_nErrCode!=0) ? (ERR_CODE_TEG + new Long(m_nErrCode).toString()+ GetEndTeg(ERR_CODE_TEG) ): "";
 
-		if (m_sErrTxt!=null && m_sErrTxt.length() > 0)	{
+		if (m_sErrTxt!=null && m_sErrTxt.length() > 0) {
 			result += ERR_TXT_TEG;
 
 			if (m_sErrTxt.length() > 0)	{
@@ -106,7 +100,7 @@ public class WCResponse {
 			result += RESP_CODE_TEG + new Long(m_nRespCode).toString()+ GetEndTeg(RESP_CODE_TEG);
 		}
 		
-		if (m_sRespTxt!=null && m_sRespTxt.length() > 0)	{
+		if (m_sRespTxt!=null && m_sRespTxt.length() > 0) {
 			result += RESP_TXT_TEG;
 			
 			if (m_sRespTxt.length() > 0)	{
@@ -143,7 +137,7 @@ public class WCResponse {
 		Entry entry = null;
 
 		if ( map != null && !map.isEmpty() ) {
-			for (Iterator it=map.entrySet().iterator(); it.hasNext();) {
+			for (Iterator it = map.entrySet().iterator(); it.hasNext();) {
 				entry = (Entry)it.next();
 				if ( sText.length() > 0 )	sText += LIST_DELIM;
 				

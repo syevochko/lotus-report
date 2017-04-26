@@ -17,6 +17,8 @@ import org.apache.http.client.fluent.Response;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
+import com.fuib.lotus.log.LogEx;
+
 public class HttpClientWrapper extends MyURLConnection {
 
 	public HttpClientWrapper(URL url, Proxy proxy) throws IOException {
@@ -32,15 +34,16 @@ public class HttpClientWrapper extends MyURLConnection {
 		try {
 			urlExecutor = org.apache.http.client.fluent.Executor.newInstance();
 			reqHttp = org.apache.http.client.fluent.Request.Get(getUrl().toURI());
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
+		}
+		catch (URISyntaxException e) {
+			System.err.println(LogEx.getMessage(e));
 			return null;
 		}
-
+		
 		if (getLogin()!=null && !getLogin().equals("") && getPasswd()!=null && !getPasswd().equals(""))	{
 			urlExecutor.auth(getLogin(), getPasswd());
 		}
-
+		
 		if (getProxy()!=null)	{
 			reqHttp.viaProxy(new org.apache.http.HttpHost(getProxy().toString()));
 			if (isDebugOn()) 
@@ -53,15 +56,14 @@ public class HttpClientWrapper extends MyURLConnection {
 		}
 
 		if (getHeaderProperties()!=null && !getHeaderProperties().isEmpty())	{
-			for( Iterator it = getHeaderProperties().keySet().iterator(); it.hasNext();  )	{
-				String key = (String)it.next();
+			for (Iterator<String> it = getHeaderProperties().keySet().iterator(); it.hasNext(); ) {
+				String key = it.next();
 				String val = getHeaderProperties().get(key); 
-				if (val!=null)	{
+				if (val != null) {
 					reqHttp.addHeader(key, val);
 				}
 			}
 		}
-
 		
 		if ("https".equals(getUrl().getProtocol()))	{			
 			TrustManager[] trustAllCert = new TrustManager[] {
@@ -81,29 +83,29 @@ public class HttpClientWrapper extends MyURLConnection {
 				sc.init(null, trustAllCert, new java.security.SecureRandom());				
 				SSLSocketFactory socketFactory = new SSLSocketFactory(sc);
 				Executor.registerScheme(new Scheme("https", getUrl().getPort(), socketFactory));
-			} catch (Exception e)	{
-				e.printStackTrace();
+			}
+			catch (Exception e) {
+				System.err.println(LogEx.getMessage(e));
 				return null;
 			}
 		}
 		
-		
 		try {
 			respHttp = urlExecutor.execute(reqHttp);
 			sURLContent = respHttp.returnContent().toString();
-
-		} catch(HttpResponseException e)	{	
+		}
+		catch(HttpResponseException e) {	
 			setLastResponseCode(e.getStatusCode());
 			
-			if ( isDebugOn() ) {
+			if (isDebugOn()) {
 				System.err.println(this.getClass().getSimpleName() + ": Failed to connect error is: " + e.getMessage());
 				System.err.println(this.getClass().getSimpleName() + ": HTTP rc is: " + e.getStatusCode());
 			}
-
-			throw new IOException(e);
 			
-		} catch (org.apache.http.client.ClientProtocolException e) {
-			e.printStackTrace();
+			throw new IOException(e);
+		}
+		catch (org.apache.http.client.ClientProtocolException e) {
+			System.err.println(LogEx.getMessage(e));
 		}
 
 		// при возврате пустой строки apache возвращает символы перевода строки (типа окончани€ потока) - дл€ совместимости с URLAction эта ситуаци€ обрабатываетс€

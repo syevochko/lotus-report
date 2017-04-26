@@ -15,11 +15,23 @@ public class LNAccess {
 	public static final int ACCESS_EDIT = 1;
 	
 	protected Session m_oSession = null;
-	protected LNAddressBook m_oPAB = null;
-	protected Vector m_vDocAccList = null;
+	protected LNPAB m_oPAB = null;
+	protected Vector<String> m_vDocAccList = null;
 	
 	public LNAccess(Session poSession) throws NotesException {
 		this.m_oSession = poSession;
+	}
+	
+	/**
+	 * Кеширование объекта LNPAB
+	 * @return LNPAB
+	 * @throws NotesException
+	 */
+	private LNPAB getLNAB() throws NotesException {
+		if (this.m_oPAB == null) {
+			this.m_oPAB = new LNPAB(this.m_oSession, true);
+		}
+		return this.m_oPAB;
 	}
 	
 	/**
@@ -33,7 +45,7 @@ public class LNAccess {
 	 * @throws NotesException 
 	 */
 	public boolean CheckUserAccess2Document(Document pdoc, String psUserName, int pnAccEditor) throws NotesException {
-		this.m_vDocAccList = new Vector();
+		this.m_vDocAccList = new Vector<String>();
 
 		// Приведение имени в единую форму
 		String sUserName = this.m_oSession.createName(psUserName).getAbbreviated();
@@ -58,7 +70,7 @@ public class LNAccess {
 //System.out.println("LIST: " + this.m_vDocAccList.toString());
 		
 		// Проверка по ролям пользователя
-		Vector vUserDbAccRoles = pdoc.getParentDatabase().queryAccessRoles(sUserName);
+		Vector<String> vUserDbAccRoles = pdoc.getParentDatabase().queryAccessRoles(sUserName);
 		for (int ni = 0; ni < vUserDbAccRoles.size(); ni++) {
 			if (this.getLNAB().isIncludeNamesList((String) vUserDbAccRoles.get(ni), this.m_vDocAccList)) {
 				// Доступ грантован ролью пользователя - разворачиваем роли в списке
@@ -83,23 +95,8 @@ public class LNAccess {
 	 * Получение текущего списка доступа (инициализация - в CheckUserAccessToDocument)
 	 * @return Текущий список доступа
 	 */
-	public Vector GetCurrentDocAccList() {
+	public Vector<String> GetCurrentDocAccList() {
 		return this.m_vDocAccList;
-	}
-	
-	
-	
-	
-	/**
-	 * Кеширование объекта LNAddressBook
-	 * @return LNAddressBook
-	 * @throws NotesException
-	 */
-	private LNAddressBook getLNAB() throws NotesException {
-		if (this.m_oPAB == null) {
-			this.m_oPAB = new LNAddressBook(this.m_oSession);
-		}
-		return this.m_oPAB;
 	}
 	
 	/**
@@ -111,9 +108,9 @@ public class LNAccess {
 	 * @return Список сущностей (уникальные значения)
 	 * @throws NotesException 
 	 */
-	private Vector getAccessListFromDocument(Document pdoc, int pnAccLevel) throws NotesException {
-		Vector vFieldsList = new Vector();
-		Vector vItems = pdoc.getItems();
+	private Vector<String> getAccessListFromDocument(Document pdoc, int pnAccLevel) throws NotesException {
+		Vector<String> vFieldsList = new Vector<String>();
+		Vector<Item> vItems = pdoc.getItems();
 		int nICount = vItems.size();
 		
 		for (int ni = 0; ni < nICount; ni++) {
@@ -128,7 +125,7 @@ public class LNAccess {
 		}
 //System.out.println("FIELDS: " + vFieldsList.toString());
 		
-		Vector vAccList = new Vector();
+		Vector<String> vAccList = new Vector<String>();
 		if (vFieldsList.size() > 0) {
 			// уникальный список сущностей
 			String sFla = vFieldsList.toString();
@@ -148,8 +145,8 @@ public class LNAccess {
 	 * @return Адаптированный список
 	 * @throws NotesException 
 	 */
-	private Vector replaceRolesWithACLEntries(Vector vSrc, Database pdb) throws NotesException {
-		Vector vRes = new Vector();
+	private Vector<String> replaceRolesWithACLEntries(Vector<String> vSrc, Database pdb) throws NotesException {
+		Vector<String> vRes = new Vector<String>();
 		String sEntry = "";
 		for (int ni = 0; ni < vSrc.size(); ni++) {
 			sEntry = (String) vSrc.get(ni);
@@ -169,12 +166,12 @@ public class LNAccess {
 	 * @return Список сущностей
 	 * @throws NotesException 
 	 */
-	private Vector getACLEntriesByRole(String psRole, Database pdb) throws NotesException {
+	private Vector<String> getACLEntriesByRole(String psRole, Database pdb) throws NotesException {
 		ACL oACL = pdb.getACL();
 		ACLEntry oACLEntry = null;
-		Vector vRoles = null;
+		Vector<String> vRoles = null;
 		
-		Vector vRes = new Vector();
+		Vector<String> vRes = new Vector<String>();
 		oACLEntry = oACL.getFirstEntry();
 		while (oACLEntry != null) {
 			vRoles = oACLEntry.getRoles();

@@ -3,6 +3,8 @@ package com.fuib.lotus.agents.report;
 import java.io.File;
 import java.io.IOException;
 
+import com.fuib.lotus.utils.Tools;
+
 import lotus.domino.Database;
 import lotus.domino.Document;
 import lotus.domino.EmbeddedObject;
@@ -97,17 +99,13 @@ public abstract class AbstructFileReportBuilder extends AbstructReportBuilder {
 					fuser.delete();	
 				}				
 			}
-				
-
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			e.printStackTrace();
-
-		} finally	{
-			if (rtf!=null)
-				rtf.recycle();
-
-			if (memo!=null)
-				memo.recycle();
+		}
+		finally {
+			Tools.recycleObj(rtf);
+			Tools.recycleObj(memo);
 		}
 	}
 

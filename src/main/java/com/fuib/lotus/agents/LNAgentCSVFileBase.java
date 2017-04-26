@@ -1,16 +1,13 @@
 package com.fuib.lotus.agents;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Vector;
 
-import com.fuib.lotus.LNEnvironment;
 import com.fuib.lotus.agents.params.ParamDocColSet;
-import com.fuib.lotus.agents.params.ParamDocColumn;
 import com.fuib.lotus.agents.report.AbstructFileReportBuilder;
 import com.fuib.lotus.agents.report.AbstructReportBuilder;
 import com.fuib.lotus.log.LNDbLog;
 import com.fuib.lotus.utils.LNIterator;
+import com.fuib.lotus.utils.Tools;
 
 import lotus.domino.Database;
 import lotus.domino.DateTime;
@@ -45,8 +42,6 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 	protected String PARAM_MULT_VAL_SEP = ",";
 	
 	protected boolean bIsFileForSQLImport = false;
-
-	protected String ERR_NOTIFY_LIST = "APP.Developers";
 
 	protected final int ERR_REQUIRED_PARAM = 1900;
 	protected final int ERR_NO_REP_BUILDER = 1910;
@@ -89,40 +84,28 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 	 * <br> также выполняется закрытие объекта {@link #repBuilder}
 	 */	
 	protected void main() throws Exception, Throwable {
-
 		DocumentCollection dc = null;
 
 		try {		
-
-			m_env = new LNEnvironment(this.m_session);
 			loadConfiguration();
 			loadColumnConfiguration();
-			initCustomLog();
-
+			
+			setCustomLog(LNDbLog.LOGTYPE_ENTRY, m_mapConfig.get(ITEM_LOGEXPIRED));
+			
 			process();
-			recycle();
-
-		} catch (NotesException ne)	{
-			logError(ne.id, ne.toString(), true);
-			ne.printStackTrace();
+		}
+		catch (NotesException ne)	{
 			if (ne.id == ERR_REQUIRED_PARAM)
 				showRequiredParams();
-
-		} catch (Throwable ex) {
-			logError(ERR_NOT_NOTES, ex.toString(), true);
-			ex.printStackTrace();
-
-		} finally	{
-
-			if (getRepBuilder()!=null)
+			throw ne;
+		}
+		finally {
+			if (getRepBuilder() != null)
 				getRepBuilder().close();
 			
-			if (dc!=null)
-				dc.recycle();
-
-			if (dbTrg!=null)
-				dbTrg.recycle();
-
+			Tools.recycleObj(searchCutoff);
+			Tools.recycleObj(dc);
+			Tools.recycleObj(dbTrg);
 		}
 	}
 
@@ -130,8 +113,9 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 	/**
 	 *	основная процедура обработки данных и формирования отчета. 
 	 * <br>Выполняется получение целевых баз для поиска, поиск по каждой базе, отправка отчета(ов) через {@link AbstructFileReportBuilder#send(String, String, Database)} 
+	 * @throws Exception 
 	 */
-	protected void process() throws NotesException	{
+	protected void process() throws Exception	{
 		
 		if (getRepBuilder()==null)	{
 			throw new NotesException(ERR_NO_REP_BUILDER, "report builder object not defined!");
@@ -162,10 +146,10 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 
 	/**
 	 выполнение поиска документов для формирования отчета по одной базе 
+	 * @throws Exception 
 	 */
-	protected void processDb(String sDbName) throws NotesException	{
+	protected void processDb(String sDbName) throws Exception	{
 		dbTrg = m_env.getDatabase(sDbName);			
-		if (dbTrg==null)	throw new NotesException(LNEnvironment.ERR_CUSTOM, "Can't open database by path: " + sDbName);		
 		
 		DocumentCollection dc = getSelectionCollection(dbTrg, getSearchCutoff());
 		processDocCollection(dc);
@@ -194,16 +178,7 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 	}
 
 	
-	@Override
-	public void logAction(String sText)		{
-		try {
-			super.logAction(sText);
-		} catch (Exception e) 	{
-			e.printStackTrace();
-		}
-	}
-	
-	protected DocumentCollection getSelectionCollection(Database dbTrg, DateTime cutoff) throws NotesException	{
+	protected DocumentCollection getSelectionCollection(Database dbTrg, DateTime cutoff) throws Exception	{
 		String sSearchCriteria = (String) m_mapConfig.get(PARAM_SELECTION_FORMULA);
 		DocumentCollection dc = dbTrg.search( sSearchCriteria, cutoff );
 		logAction("Search in [" + dbTrg.getFilePath() + "], criteria is ["+sSearchCriteria+"], cutoff date: " + cutoff + " - found docs: " + dc.getCount() );
@@ -241,42 +216,10 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 		System.out.println(PARAM_DBTRG_PATH + " - список баз, разделенных <;> на текущем сервере для отбора документов" );
 		System.out.println(PARAM_SELECTION_FORMULA + " - @-формула отбора документов в заданных базах через db.search()" );
 	}	
-
-	/**
-	 * инициализация подсистемы логирования
-	 * TODO - надо бы вынести на уровнень родителей
-	 */
-	protected void initCustomLog() throws NotesException, Exception	{
-		if ( m_sLogCategory != null ) {
-			LNDbLog log = new LNDbLog(m_sLogCategory);
-
-			log.open((m_sLogDb != null)?m_env.getDatabase(m_sLogDb):m_dbCurrent, LNDbLog.LOGTYPE_APPEND);
-			log.setProperty(LNDbLog.PROP_EXPIRED, m_mapConfig.get(ITEM_LOGEXPIRED));
-
-			setCustomLog(log);
-		}
-
-		setLogOption(true, (m_sLogCategory!=null && m_sLogDb != null), false, false);
-	}
-
-	protected void logError(int nErr, String sText, boolean bSendNotify) throws Exception {
-		super.logError(nErr, sText);
-
-		if (bSendNotify)	{
-			Vector<String> vTo = new Vector<String>(Arrays.asList(ERR_NOTIFY_LIST.split(",")));
-			String sServer = (String) m_session.evaluate("@Name([CN]; '"+m_dbCurrent.getServer()+"')").firstElement();
-			String sSubject = "["+sServer+"] Внимание! Произошла ошибка при работе агента " + m_sAgName + " в базе " + m_dbCurrent.getFilePath();
-			String sText1 = "Произошла ошибка:\r Код: " + nErr + "\r описание: " + sText + "\r Подробности см: notes://" + sServer + "/log.nsf" ;
-			sendMail(vTo, "", sSubject, sText1, true, null, false);
-		}
-	}
 	
-	protected void recylce()	{
-		super.recycle();
-	}
-
+	
 	@Deprecated
 	protected void ws_call() throws Exception {
 	}
-
+	
 }

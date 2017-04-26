@@ -21,6 +21,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import com.fuib.lotus.log.LogEx;
+
 import sun.misc.BASE64Encoder;
 
 /**
@@ -92,93 +94,87 @@ public class MyURLConnection {
 		HttpURLConnection urlCon = null;
 		InputStream streamInput = null;
 		String sRetContent = null;
-
+		
 		urlCon = getConnection(url, proxy);
 		urlCon.setUseCaches(bUseCaches);
 		urlCon.setRequestMethod(getRequestMethod());
-
+		
 		if (login!=null && !login.equals("") && passwd!=null && !passwd.equals(""))	{
 			String credentials = login + ":" + passwd;
 			String headerProperty = "Basic "+ new BASE64Encoder().encode(credentials.getBytes());
 			setHTTPHeaderProperty("Authorization", headerProperty);			
 		} 		
-
-
-		if (headerProperties!=null && !headerProperties.isEmpty())	{
-			for( Iterator it = headerProperties.keySet().iterator(); it.hasNext();  )	{
-				String key = (String)it.next();
+		
+		if (headerProperties!=null && !headerProperties.isEmpty()) {
+			for (Iterator<String> it = headerProperties.keySet().iterator(); it.hasNext(); ) {
+				String key = it.next();
 				String val = headerProperties.get(key); 
-				if (val!=null)	{
-					urlCon.setRequestProperty( key, val);
+				if (val != null) {
+					urlCon.setRequestProperty(key, val);
 				}
 			}
 		}
 
-
 		try { 
 			streamInput = urlCon.getInputStream();
 			nLastResponseCode = urlCon.getResponseCode();
-			
-		} catch (IOException ioe) {
-			
-			if ( isDebugOn() ) {
-				ioe.printStackTrace();
+		}
+		catch (IOException ioe) {
+			if (isDebugOn()) {
+				System.err.println(LogEx.getErrInfo(ioe, false));
 			}
 			
 			try {
 				nLastResponseCode = urlCon.getResponseCode();
-			} catch (Exception e) {
-				e.printStackTrace();
+			}
+			catch (Exception e) {
+				System.err.println(LogEx.getMessage(e));
 			}
 			
-			if ( isDebugOn() ) {
-				System.err.println(this.getClass().getSimpleName() + ".getContent: Failed getInputStream. Error is: " + ioe.getMessage());
+			if (isDebugOn()) {
 				System.err.println(this.getClass().getSimpleName() + ".getContent: HTTP rc is: " + nLastResponseCode);
 			}
-
+			
 			urlCon.disconnect();
 			throw new IOException(ioe);
 		}			
-
-
-		if ( streamInput != null ) {
+		
+		if (streamInput != null) {
 			BufferedReader inputData = new BufferedReader(new InputStreamReader(streamInput));
 			StringWriter outData = new StringWriter();
-			String sLine;		 
-
+			String sLine; 
+			
 			while ((sLine = inputData.readLine()) != null)
 				outData.write(sLine);
-
+			
 			inputData.close();
 			sRetContent = outData.toString();
 		}
 
-		if (urlCon!=null)
+		if (urlCon != null)
 			urlCon.disconnect();		
 
 		return sRetContent;
 	}
 
 	// create connection
-	private HttpURLConnection getConnection(URL url, Proxy proxy) throws IOException	{
+	private HttpURLConnection getConnection(URL url, Proxy proxy) throws IOException {
 		HttpURLConnection urlCon = null;
 
-		if ("https".equals(url.getProtocol()))	{
+		if ("https".equals(url.getProtocol())) {
 			return getSecuredConnection(url, proxy);
-
-		} else	{
-
-			if (proxy!=null)	{
-				urlCon = (HttpURLConnection)this.getUrl().openConnection(proxy);
-				if (isDebugOn()) 
+		}
+		else {
+			if (proxy != null) {
+				urlCon = (HttpURLConnection) this.getUrl().openConnection(proxy);
+				if (isDebugOn())
 					System.out.println(this.getClass().getSimpleName() + ": connection to " + urlCon.getURL().toString() + " opened via proxy " + proxy.toString());
-
-			} else 	{
-				urlCon = (HttpURLConnection)this.getUrl().openConnection();
+			}
+			else {
+				urlCon = (HttpURLConnection) this.getUrl().openConnection();
 				if (isDebugOn())	
 					System.out.println(this.getClass().getSimpleName() + ": connection to " + urlCon.getURL().toString() + " opened");
-			}		
-
+			}
 			return urlCon;
 		}		
 	}
@@ -214,19 +210,19 @@ public class MyURLConnection {
 			SSLContext sc = SSLContext.getInstance("SSL");
 			sc.init(null, trustAllCert, new java.security.SecureRandom());            
 			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());				
-		} catch (Exception e)	{
-			e.printStackTrace();
-			throw new IOException(e.getMessage());
+		}
+		catch (Exception e)	{
+			System.err.println(LogEx.getMessage(e));
+			throw new IOException(LogEx.getMessage(e));
 		}
 
 		//			now set HostnameVerifier for current connection - allow connection to all hosts.
 		//			!Lotus client doesn't allow HttpsURLConnection.setDefaultHostnameVerifier
-		urlCon.setHostnameVerifier(	new HostnameVerifier() { 
+		urlCon.setHostnameVerifier(new HostnameVerifier() { 
 			public boolean verify(String string, SSLSession sSLSession) { return true; }
-		}		
+		}
 		);
 
 		return urlCon;
-
 	}
 }

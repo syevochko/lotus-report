@@ -314,7 +314,7 @@ public class LNAddressBook implements lotus.domino.Base {
 				}
 			}			
 		} finally {
-			Tools.recycleLNObj(oName);			
+			Tools.recycleObj(oName);
 	}		
 		
 		return false;		
@@ -322,7 +322,7 @@ public class LNAddressBook implements lotus.domino.Base {
 	
 	
 	/*
-	 * explore group content to names list. Recurcó is used. Function result is cached
+	 * explore group content to names list. Recurcï¿½ is used. Function result is cached
 	 */
 	public Vector groupMembers(String sGroupName) throws NotesException {
 		if ( !m_cache.containsKey(sGroupName) ) {

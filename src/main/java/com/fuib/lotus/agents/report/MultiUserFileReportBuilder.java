@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.util.Map.Entry;
 
-import com.fuib.lotus.agents.LNAgentBase;
-
 import lotus.domino.Database;
 import lotus.domino.Document;
 import lotus.domino.NotesException;

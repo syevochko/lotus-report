@@ -4,15 +4,12 @@ import sun.misc.BASE64Encoder;
 import sun.misc.BASE64Decoder;
 import java.io.*;
 
-
-
 /**
  * This is a class that can base64 encode or base64 decode
  * a given file or decode base64 string. 
  * File will do the encoding/decoding "in place", such
  * that the file will be overwritten.  
 */
- 
 public class Base64Java {
 	/** 
 	 * @param sBase64String - base64 encoded string

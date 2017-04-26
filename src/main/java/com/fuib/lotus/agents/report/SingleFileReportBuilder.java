@@ -36,6 +36,10 @@ public class SingleFileReportBuilder extends AbstructFileReportBuilder {
 		
 		if (fw==null)	{
 			fw = new OutputStreamWriter( new FileOutputStream(getReportFile()), Charset.defaultCharset() );
+			if (getRepTitle().length() > 0)	{
+				buff.insert(0, FILE_LINE_SEP);
+				buff.insert(0, getRepTitle());
+			}
 		}
 		
 		try {

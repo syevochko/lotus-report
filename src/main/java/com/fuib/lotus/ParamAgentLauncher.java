@@ -2,6 +2,8 @@ package com.fuib.lotus;
 
 import java.util.Vector;
 
+import com.fuib.lotus.utils.Tools;
+
 import lotus.domino.Agent;
 import lotus.domino.Database;
 import lotus.domino.Document;
@@ -31,19 +33,17 @@ public class ParamAgentLauncher {
 			throw new NotesException(1001, "Agent name to launch isn't define/open!");
 
 		m_dbAgentHolder = dbHolder;
-		if (m_dbAgentHolder==null || !m_dbAgentHolder.isOpen())
+		if (m_dbAgentHolder == null || !m_dbAgentHolder.isOpen())
 			throw new NotesException(1002, "Database object <dbAgentHolder> isn't define/open!");
 
-		if (m_Agent==null || 
-				(m_Agent!=null && !m_Agent.getName().toLowerCase().equals(sAgentName.toLowerCase())) )	
-		{
-			if(m_Agent!=null)	{m_Agent.recycle();}				
+		if (m_Agent == null || (m_Agent != null && !m_Agent.getName().toLowerCase().equals(sAgentName.toLowerCase()))) {
+			Tools.recycleObj(m_Agent);
 			m_Agent = m_dbAgentHolder.getAgent(sAgentName);
 		}
 	}
 
 	public void createDocParam() throws NotesException	{
-		if(m_docParam==null)
+		if(m_docParam == null)
 			m_docParam = m_dbDocParamHolder.createDocument();
 	}
 	public void createDocParam( Database dbHolder ) throws NotesException	{
@@ -60,8 +60,8 @@ public class ParamAgentLauncher {
 		for(int i=0; i<itNames.length; i++)		{
 			if( docSource.hasItem(itNames[i]) )	{
 				itSrc = docSource.getFirstItem(itNames[i]);
-				m_docParam.copyItem(itSrc).recycle();
-				itSrc.recycle();
+				Tools.recycleObj(m_docParam.copyItem(itSrc));
+				Tools.recycleObj(itSrc);
 			}
 		}
 	}
@@ -74,11 +74,10 @@ public class ParamAgentLauncher {
 	public void appendToTextList(String sItemName, Vector value) throws NotesException	{		
 		this.createDocParam();
 		if (m_docParam.hasItem(sItemName) && 
-				(m_docParam.getItemValue(sItemName).size()>1 || m_docParam.getItemValueString(sItemName).length()!=0) )	
-		{
+				(m_docParam.getItemValue(sItemName).size()>1 || m_docParam.getItemValueString(sItemName).length()!=0)) {
 			Item it = m_docParam.getFirstItem(sItemName);
 			it.appendToTextList(value);
-			it.recycle();
+			Tools.recycleObj(it);
 		}
 		else
 			this.replaceItemValue(sItemName, value);
@@ -94,8 +93,8 @@ public class ParamAgentLauncher {
 	public void launchAgent() throws NotesException {
 		m_docParam.save(true);
 		m_sNoteID = m_docParam.getNoteID();
-		m_docParam.recycle();
-		m_Agent.runOnServer( m_sNoteID );
+		Tools.recycleObj(m_docParam);
+		m_Agent.runOnServer(m_sNoteID);
 		m_docParam = m_dbDocParamHolder.getDocumentByID(m_sNoteID);
 	}
 	
@@ -120,16 +119,13 @@ public class ParamAgentLauncher {
 	}
 	
 	public void recycle() throws NotesException	{
-		if (m_Agent!=null)	
-			m_Agent.recycle();
+		Tools.recycleObj(m_Agent);
 		
-		if (m_docParam!=null) 
+		if (m_docParam != null)
 			m_docParam.remove(true);
 		
-		if (m_dbAgentHolder!=null) 
-			m_dbAgentHolder = null;		// clear link on object		
+		m_dbAgentHolder = null;		// clear link on object		
 		
-		if (m_dbDocParamHolder!=null) 
-			m_dbDocParamHolder = null;
+		m_dbDocParamHolder = null;
 	}
 }

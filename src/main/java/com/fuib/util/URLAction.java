@@ -9,6 +9,9 @@ import java.net.URL;
 import java.net.HttpURLConnection;
 import java.util.Hashtable;
 import java.util.Vector;
+
+import com.fuib.lotus.log.LogEx;
+
 import sun.misc.BASE64Encoder;
 
 public class URLAction {
@@ -26,12 +29,12 @@ public class URLAction {
 	protected String m_sHEADER_PROP_AUTH = null;
 	protected boolean mDereferenceDNS = true;
 
-	private static Hashtable hashCache=null;				// static cache for success accessed hosts @see setToCache
+	private static Hashtable<String, InetAddress> hashCache = null;				// static cache for success accessed hosts @see setToCache
 	private static boolean m_bIsDebug = false;
 	private String m_URI =null;
 	private InetAddress[] m_vHost = null;	
 	private String m_sOrigHost = null;
-	private Vector m_vHTTPCode_Halt = new Vector();
+	private Vector<Integer> m_vHTTPCode_Halt = new Vector<Integer>();
 
 
 	//	set of constructors
@@ -57,7 +60,7 @@ public class URLAction {
 		int ind = 0;
 
 		if (hashCache==null)
-			hashCache = new Hashtable();
+			hashCache = new Hashtable<String, InetAddress>();
 
 		String sURLAddr = a_sURL;
 		String sProtocol = (a_sProtocol != null && !"".equals(a_sProtocol))?a_sProtocol.toLowerCase():((new URL(sURLAddr)).getProtocol()+"://");
@@ -80,17 +83,17 @@ public class URLAction {
 
 		m_vHost = InetAddress.getAllByName(m_sOrigHost);	// return InetAddress[] - an array of IP addresses and host names, based on m_sOrigHost
 
-		InetAddress inTmp= (InetAddress)hashCache.get(m_sOrigHost);
+		InetAddress inTmp = (InetAddress) hashCache.get(m_sOrigHost);
 		if (inTmp!=null)				// try to use hostname from cache 
 		{
-			Vector vTmp=new Vector ();
+			Vector vTmp = new Vector();
 			for (int i = 0; i < m_vHost.length; i++) {
 				vTmp.add(m_vHost[i]);
 			}
 			vTmp.remove(inTmp);
 			vTmp.add(0, inTmp);
 
-			m_vHost=(InetAddress[])vTmp.toArray(new InetAddress[0]);
+			m_vHost = (InetAddress[]) vTmp.toArray(new InetAddress[0]);
 		}
 
 		//		replace host name by dereferenced host name
@@ -119,17 +122,12 @@ public class URLAction {
 		MyURLConnection urlCon = null;
 
 		try {
-			Class clRequest = Class.forName("org.apache.http.client.fluent.Request");
 			urlCon = new HttpClientWrapper(url, null);
-			if ( isDebug() ) {
+			if (isDebug()) {
 				System.out.println("get url conneection by apache httpclient...");
 			}
-		} catch (ClassNotFoundException e) {
-			if ( isDebug() ) {
-				System.out.println("Libs of Apache httpclient not found - working throw url.openConnection()!");				
-			}
 		} finally {
-			if (urlCon==null)	{
+			if (urlCon == null)	{
 				urlCon = new MyURLConnection(url, null);
 			}
 		}
@@ -196,7 +194,7 @@ public class URLAction {
 
 	public String getURLContent() throws IOException {
 		String sURLContent = null;
-		Vector vHostName = new Vector(m_vHost.length);	
+		Vector<String> vHostName = new Vector<String>(m_vHost.length);	
 
 		// try to connect via given URL		
 		try	{
@@ -293,10 +291,10 @@ public class URLAction {
 		try {
 			URLAction action = new URLAction(sURL, bCached);
 			action.setHaltHTTPCode(HttpURLConnection.HTTP_NOT_FOUND);
-
 			sContent = action.getURLContent();
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		catch (IOException e) {
+			System.err.println(LogEx.getMessage(e));
 			sContent = "";
 		}
 

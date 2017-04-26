@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 
+import com.fuib.lotus.log.LogEx;
+
 /**
  * Class for get content from https conncetion.<br>
  * Class supports https connections, GET request methods, basic and SSO authentication.<br>
@@ -43,10 +45,10 @@ public class SSLURLAction extends URLAction {
 		try {
 			SSLURLAction action = new SSLURLAction(login, passw, sURL, bCached, false);
 			action.setHaltHTTPCode(HttpURLConnection.HTTP_NOT_FOUND);
-			
 			sContent = action.getURLContent();
-		} catch (IOException e) {
-			e.printStackTrace();
+		}
+		catch (IOException e) {
+			System.err.println(LogEx.getMessage(e));
 			sContent = "";
 		}
 		
