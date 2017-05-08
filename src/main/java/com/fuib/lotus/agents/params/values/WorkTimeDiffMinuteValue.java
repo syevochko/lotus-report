@@ -26,7 +26,7 @@ public class WorkTimeDiffMinuteValue extends TimeDiffMinuteValue {
     @Override
     protected long calculateDatesDifference(Date d1, Date d2) {
         try {
-            return datesDiff.GetWorkTimeBetweenTwoDates(d1, d2, true);
+            return (long) datesDiff.GetWorkTimeBetweenTwoDates(d1, d2, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
