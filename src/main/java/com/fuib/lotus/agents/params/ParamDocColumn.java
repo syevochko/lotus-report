@@ -1,6 +1,5 @@
 package com.fuib.lotus.agents.params;
 
-import com.fuib.lotus.LNEnvironment;
 import com.fuib.lotus.agents.params.values.AbstractColumnValue;
 import lotus.domino.DateTime;
 import lotus.domino.Document;
@@ -26,8 +25,7 @@ public class ParamDocColumn {
     protected static SimpleDateFormat oColsDateFormatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     protected static DecimalFormat oColsDoubleFormatter;
 
-    protected LNEnvironment env;
-    protected AbstractColumnValue columnValue;
+    protected AbstractColumnValue columnValueObj;
 
     static {
         DecimalFormatSymbols dfs = new DecimalFormatSymbols();
@@ -47,12 +45,7 @@ public class ParamDocColumn {
         String sMyParamValue = sParamValue;
         sColValue = sMyParamValue;
         sColDescription = sParamDescription;
-        columnValue = ColumnValueFactory.getColumnObject(sMyParamValue, env);
-    }
-
-    public ParamDocColumn(String sParamValue, String sParamDescription, LNEnvironment environment) {
-        this(sParamValue, sParamDescription);
-        env = environment;
+        columnValueObj = ColumnValueFactory.getColumnObject(sMyParamValue);
     }
 
     /**
@@ -72,8 +65,13 @@ public class ParamDocColumn {
 
     public void setColumnValue(String sColumnValue) {
         sColValue = sColumnValue;
-        columnValue = ColumnValueFactory.getColumnObject(sColValue, env);
+        columnValueObj = ColumnValueFactory.getColumnObject(sColValue);
     }
+
+    public AbstractColumnValue getColumnValueObj() {
+        return columnValueObj;
+    }
+
 
     public void setColDescription(String sColDescription) {
         this.sColDescription = sColDescription;
@@ -109,7 +107,7 @@ public class ParamDocColumn {
             Session sess = doc.getParentDatabase().getParent();
             StringBuffer sb = new StringBuffer();
 
-            v = columnValue.getColumnValue(doc);
+            v = columnValueObj.getColumnValue(doc);
 
             if (v != null && !v.isEmpty()) {
                 for (int i = 0; i < v.size(); i++) {
@@ -117,6 +115,8 @@ public class ParamDocColumn {
                         sb.append((String) v.get(i));
                     else if (v.get(i) instanceof Double)
                         sb.append(myDecFormat.format(((Double) v.get(i)).doubleValue()));
+                    else if (v.get(i) instanceof Integer)
+                        sb.append(myDecFormat.format(((Integer) v.get(i)).intValue()));
                     else if (v.get(i) instanceof DateTime)
                         sb.append(myDateFormat.format(((DateTime) v.get(i)).toJavaDate()));
 

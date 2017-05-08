@@ -1,27 +1,29 @@
 package com.fuib.lotus.agents.params;
 
-import com.fuib.lotus.LNEnvironment;
-import com.fuib.lotus.agents.params.values.*;
+import com.fuib.lotus.agents.params.values.AbstractColumnValue;
+import com.fuib.lotus.agents.params.values.FieldValue;
+import com.fuib.lotus.agents.params.values.FormulaValue;
+import com.fuib.lotus.agents.params.values.UndefineValue;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ColumnValueFactory {
-    private static final Pattern CLASS_PATTERN = Pattern.compile("\\{(\\w+)\\}(.*)");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{(\\w+)\\s*(.*)\\}");
 
-    public static AbstractColumnValue getColumnObject(String sColumnValue, LNEnvironment env)  {
-        if (sColumnValue.startsWith("@"))   {
-            if (sColumnValue.length() > 1)  {
+    public static AbstractColumnValue getColumnObject(String sColumnValue) {
+        if (sColumnValue.startsWith("@")) {
+            if (sColumnValue.length() > 1) {
                 return new FormulaValue(sColumnValue);
             }
 
-        } else  if (sColumnValue.startsWith("{"))   {
+        } else if (sColumnValue.startsWith("#{")) {
             Matcher m = CLASS_PATTERN.matcher(sColumnValue);
-            if (m.matches())    {
+            if (m.matches()) {
                 try {
-                    Class c = Class.forName(m.group(1));
-                    Object obj = c.getConstructor(String.class, LNEnvironment.class).newInstance(m.group(2), env);
-                    return (AbstractBracesValue) obj;
+                    Class c = Class.forName("com.fuib.lotus.agents.params.values." + m.group(1));
+                    Object obj = c.getConstructor(String.class).newInstance(m.group(2));
+                    return (AbstractColumnValue) obj;
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -34,13 +36,5 @@ public class ColumnValueFactory {
         }
 
         return new UndefineValue(sColumnValue);
-    }
-
-    public static void main(String[] args) {
-        Matcher m = CLASS_PATTERN.matcher("{12121}2222");
-        System.out.println(m.matches());
-        System.out.println(m.group(0));
-        System.out.println(m.group(1));
-        System.out.println(">>> " + m.group(2));
     }
 }

@@ -23,7 +23,7 @@ public abstract class AbstructReportBuilder {
 	
 	private String sRepName = "";
 
-	private String sRepTitle = "";
+	protected String sRepTitle = "";
 
 	public String getSRepName() {
 		return sRepName;
