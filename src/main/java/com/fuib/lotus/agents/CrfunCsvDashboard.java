@@ -12,6 +12,8 @@ import lotus.domino.*;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -119,6 +121,7 @@ public class CrfunCsvDashboard extends LNAgentCSVFileBase {
 			cv.setEnv(m_env);
 			cv.setBaseMap(baseMap);
 			cv.setDatesDiff(datesDiff);
+			cv.setTargetDatabases(getTargetDBs());
 		}
 
 		final SimpleDateFormat oFileNameFormatter = new SimpleDateFormat("yyyy-MM-ddHHmmss");
@@ -135,6 +138,16 @@ public class CrfunCsvDashboard extends LNAgentCSVFileBase {
 			e.printStackTrace();
 		}
 		return dbPaths;
+	}
+	
+	private List<Database> getTargetDBs() throws NotesException	{
+		List<String> dbPaths = new ArrayList<String>(Arrays.asList(getTargetDbPaths()));
+		List<Database> dbList = new ArrayList(dbPaths.size());
+		for (String path : dbPaths)	{
+			Database db = m_env.getDatabase(path);
+			dbList.add(db);
+		}
+		return dbList;
 	}
 
 }

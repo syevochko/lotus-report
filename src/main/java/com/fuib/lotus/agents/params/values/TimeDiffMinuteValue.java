@@ -37,7 +37,8 @@ public class TimeDiffMinuteValue extends AbstractColumnValue {
         Vector<String> tranLog = doc.getItemValue("%TransactionLog");
         for (int i = 0; i < tranLog.size(); i++) {
             String nextRec = (i + 1 != tranLog.size()) ? tranLog.get(i + 1) : null;
-            totalMinutesAmount = totalMinutesAmount + getWorkingMinutes(tranLog.get(i), nextRec);
+            System.out.println(tranLog.get(i) + "\n" + nextRec);
+            totalMinutesAmount = totalMinutesAmount + getWorkingTimeDifference(tranLog.get(i), nextRec);
         }
         Vector v = new Vector(1);
         v.add(totalMinutesAmount);
@@ -48,7 +49,7 @@ public class TimeDiffMinuteValue extends AbstractColumnValue {
         return TimeDiffHelper.calculateTimeInMinutes(d1, d2);
     }
 
-    protected long getWorkingMinutes(String curRec, String nextRec) {
+    protected long getWorkingTimeDifference(String curRec, String nextRec) {
         LogTokenizer curLogTokenizer = new LogTokenizer(curRec);
         long workMinutes = 0;
 

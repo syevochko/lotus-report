@@ -117,6 +117,8 @@ public class ParamDocColumn {
                         sb.append(myDecFormat.format(((Double) v.get(i)).doubleValue()));
                     else if (v.get(i) instanceof Integer)
                         sb.append(myDecFormat.format(((Integer) v.get(i)).intValue()));
+                    else if (v.get(i) instanceof Long)
+                        sb.append(myDecFormat.format(((Long) v.get(i)).longValue()));
                     else if (v.get(i) instanceof DateTime)
                         sb.append(myDateFormat.format(((DateTime) v.get(i)).toJavaDate()));
 

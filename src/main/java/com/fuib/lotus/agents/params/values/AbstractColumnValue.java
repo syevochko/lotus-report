@@ -4,7 +4,9 @@ import com.fuib.lotus.LNEnvironment;
 import com.fuib.util.WorkTimeBetweenTwoDates;
 import lotus.domino.Document;
 import lotus.domino.NotesException;
+import lotus.domino.Database;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -13,6 +15,7 @@ public abstract class AbstractColumnValue {
     protected LNEnvironment env;
     protected WorkTimeBetweenTwoDates datesDiff;
     protected Map<String, lotus.domino.Base> baseMap;
+    protected List<Database> targetDatabases;
 
     public AbstractColumnValue(String value) {
         colValue = value;
@@ -20,6 +23,10 @@ public abstract class AbstractColumnValue {
 
     public abstract Vector getColumnValue(Document doc) throws NotesException;
 
+    public void setTargetDatabases(List<Database> dbs)	{
+    	targetDatabases = dbs;
+    }
+    
     public LNEnvironment getEnv() {
         return env;
     }
