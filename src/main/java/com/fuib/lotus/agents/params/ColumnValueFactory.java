@@ -22,7 +22,7 @@ public class ColumnValueFactory {
             if (m.matches()) {
                 try {
                     Class c = Class.forName("com.fuib.lotus.agents.params.values." + m.group(1));
-                    Object obj = c.getConstructor(String.class).newInstance(m.group(2));
+                    Object obj = c.getConstructor(String.class, ParamDocColSet.class).newInstance(m.group(2), parent);
                     return (AbstractColumnValue) obj;
 
                 } catch (Exception e) {
