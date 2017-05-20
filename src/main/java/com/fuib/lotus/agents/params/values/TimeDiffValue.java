@@ -3,22 +3,25 @@ package com.fuib.lotus.agents.params.values;
 import com.fuib.lotus.agents.params.values.util.LogDateParser;
 import com.fuib.lotus.agents.params.values.util.LogTokenizer;
 import com.fuib.lotus.agents.params.values.util.TimeDiffHelper;
+import com.fuib.util.WorkTimeBetweenTwoDates;
 import lotus.domino.Document;
 import lotus.domino.NotesException;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TimeDiffMinuteValue extends AbstractColumnValue {
-    protected static final Pattern VALUES_PATTERN = Pattern.compile("state_id='([^']+)'\\s*(log_contains='([^']+)')??");
+public class TimeDiffValue extends AbstractColumnValue {
+    private static final Pattern VALUES_PATTERN = Pattern.compile("state_id='([^']+)'\\s*(log_contains='([^']+)')??");
 
-    protected final String stateID;
-    protected final String logContainsStr;
+    private final String stateID;
+    private final String logContainsStr;
 
-    public TimeDiffMinuteValue(String value) {
+    public TimeDiffValue(String value) {
         super(value);
         Matcher m = VALUES_PATTERN.matcher(colValue);
         if (m.matches()) {
@@ -33,26 +36,22 @@ public class TimeDiffMinuteValue extends AbstractColumnValue {
 
     @Override
     public Vector getColumnValue(Document doc) throws NotesException {
-        long totalMinutesAmount = 0;
+        int totalMinutesAmount = 0;
         Vector<String> tranLog = doc.getItemValue("%TransactionLog");
         for (int i = 0; i < tranLog.size(); i++) {
             String nextRec = (i + 1 != tranLog.size()) ? tranLog.get(i + 1) : null;
-            totalMinutesAmount = totalMinutesAmount + getWorkingTimeDifference(tranLog.get(i), nextRec);
+            totalMinutesAmount = totalMinutesAmount + getWorkingMinutes(tranLog.get(i), nextRec);
         }
         Vector v = new Vector(1);
         v.add(totalMinutesAmount);
         return v;
     }
 
-    protected long calculateDatesDifference(Date d1, Date d2) {
-        return TimeDiffHelper.calculateTimeInMinutes(d1, d2);
-    }
-
-    protected long getWorkingTimeDifference(String curRec, String nextRec) {
+    private int getWorkingMinutes(String curRec, String nextRec) {
         LogTokenizer curLogTokenizer = new LogTokenizer(curRec);
-        long workMinutes = 0;
+        int workMinutes = 0;
 
-        if (stateID.contains(curLogTokenizer.getStateID()) && (logContainsStr.length() == 0 || curRec.contains(logContainsStr))) {
+        if (stateID.equalsIgnoreCase(curLogTokenizer.getStateID()) && (logContainsStr.length() == 0 || curRec.contains(logContainsStr))) {
             Date d1 = LogDateParser.parseDate(curLogTokenizer.getDateTime());
             if (d1 != null) {
                 try {
@@ -60,10 +59,10 @@ public class TimeDiffMinuteValue extends AbstractColumnValue {
                         LogTokenizer nextLogTokenizer = new LogTokenizer(nextRec);
                         Date d2 = LogDateParser.parseDate(nextLogTokenizer.getDateTime());
                         if (d2 != null) {
-                            workMinutes = calculateDatesDifference(d1, d2);
+                            workMinutes = datesDiff.GetWorkTimeBetweenTwoDates(d1, d2, true);
                         }
                     } else {
-                        workMinutes = calculateDatesDifference(d1, Calendar.getInstance().getTime());
+                        workMinutes = datesDiff.GetWorkTimeBetweenTwoDates(d1, Calendar.getInstance().getTime(), true);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

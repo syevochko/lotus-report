@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ColumnValueFactory {
-    private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{(\\w+)\\s*(.*)\\}");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{([\\w.]+)\\s*(.*)\\}");
 
     public static AbstractColumnValue getColumnObject(String sColumnValue) {
         if (sColumnValue.startsWith("@")) {

@@ -47,13 +47,13 @@ public class LNAgentCSVFileBase extends LNWSClient_woHTTP {
 	protected final int ERR_NO_REP_BUILDER = 1910;
 	protected final int ERR_NOT_NOTES = 1999;	
 
-	private String sReportSubject = "";
-	private String sReportAppendText = "";
+	protected String sReportSubject = "";
+	protected String sReportAppendText = "";
 	
-	private Database dbTrg = null;	
-	private ParamDocColSet paramCols = new ParamDocColSet();
-	private AbstructFileReportBuilder repBuilder = null;
-	private DateTime searchCutoff = null; 
+	protected Database dbTrg = null;
+	protected ParamDocColSet paramCols = new ParamDocColSet();
+	protected AbstructFileReportBuilder repBuilder = null;
+	protected DateTime searchCutoff = null;
 
 	
 	// getters and setters

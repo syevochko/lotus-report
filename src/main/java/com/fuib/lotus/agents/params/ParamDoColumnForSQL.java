@@ -1,45 +1,56 @@
 package com.fuib.lotus.agents.params;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-
 import lotus.domino.Document;
 import lotus.domino.NotesException;
 
+import java.util.Map;
+import java.util.Vector;
+
 /**
- * @date Dec 20, 2014
- * @author evochko 
- * @Description: обработка параметра профиля агента, который должен вычисляться на контексте целевых документов - для формирования csv-файлов для загрузки в SQL-базы данных
- * добавлено поле  bHasSqlNullIfEmpty
+ * Dec 20, 2014
+ *
+ * @author evochko
+ *         обработка параметра профиля агента, который должен вычисляться на контексте целевых документов - для формирования csv-файлов для загрузки в SQL-базы данных
+ *         добавлено поле  bHasSqlNullIfEmpty
  */
 public class ParamDoColumnForSQL extends ParamDocColumn {
 
-	private boolean bHasSqlNullIfEmpty = false;
-	
-	protected String SQL_NULL = "#NA";
-	
-	public ParamDoColumnForSQL(String paramValue, String paramDescription, boolean bHasSqlNullIfEmpty) {
-		super(paramValue, paramDescription);
-		setHasSqlNullIfEmpty(bHasSqlNullIfEmpty);
-	}
+    private boolean bHasSqlNullIfEmpty = false;
 
-	public boolean isHasSqlNullIfEmpty() { return bHasSqlNullIfEmpty; }
-	public void setHasSqlNullIfEmpty(boolean hasSqlNullIfEmpty) { bHasSqlNullIfEmpty = hasSqlNullIfEmpty; }
+    private String SQL_NULL = "#NA";
 
-	/**
-	 * {@link ParamDocColumn#processDocColumn(Document, String, DecimalFormat, SimpleDateFormat)}
-	 */
-	public String processDocColumn(Document doc, String asValueSep, DecimalFormat amyDecFormat, SimpleDateFormat amyDateFormat) throws NotesException 		{
-		String sResult = super.processDocColumn(doc, asValueSep, amyDecFormat, amyDateFormat);
-		
-		if ( sResult.length()>0 )
-			return sResult;
-		
-		else if ( isHasSqlNullIfEmpty() )
-			return SQL_NULL;
-		
-		else
-			return "";			
-			
-	}
+    @Deprecated
+    public ParamDoColumnForSQL(String paramValue, String paramDescription, boolean bHasSqlNullIfEmpty) {
+        this(null, paramValue, paramDescription, bHasSqlNullIfEmpty, null);
+    }
+
+    public ParamDoColumnForSQL(String colName, String sParamValue, String sParamDescription, boolean bHasSqlNullIfEmpty, Map<String, Vector<?>> columnsValues) {
+        super(colName, sParamValue, sParamDescription, columnsValues);
+        this.bHasSqlNullIfEmpty = bHasSqlNullIfEmpty;
+    }
+
+    public boolean isHasSqlNullIfEmpty() {
+        return bHasSqlNullIfEmpty;
+    }
+
+    public void setHasSqlNullIfEmpty(boolean hasSqlNullIfEmpty) {
+        bHasSqlNullIfEmpty = hasSqlNullIfEmpty;
+    }
+
+    @SuppressWarnings("rawtypes,unchecked")
+    @Override
+    public Vector processDocColumn(Document doc) throws NotesException {
+        Vector vResult = super.processDocColumn(doc);
+
+        if (vResult == null || vResult.isEmpty() || String.valueOf(vResult.get(0)).length() == 0) {
+            vResult = new Vector(1);
+            if (isHasSqlNullIfEmpty()) {
+                vResult.add(SQL_NULL);
+            } else {
+                vResult.add("");
+            }
+        }
+
+        return vResult;
+    }
 }
