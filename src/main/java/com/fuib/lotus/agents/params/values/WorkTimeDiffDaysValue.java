@@ -1,23 +1,25 @@
 package com.fuib.lotus.agents.params.values;
 
+import com.fuib.lotus.agents.params.ParamDocColSet;
+import com.fuib.lotus.agents.params.values.util.TimeDiffHelper;
 import lotus.domino.Document;
 import lotus.domino.NotesException;
 
 import java.util.Vector;
 
+//#{WorkTimeDiffDaysValue state_id='CRFUN_Created' log_contains='O=fuib'}
 public class WorkTimeDiffDaysValue extends WorkTimeDiffMinuteValue {
 
-    public WorkTimeDiffDaysValue(String value) {
-        super(value);
+    public WorkTimeDiffDaysValue(String value, ParamDocColSet parentColumnSet) {
+        super(value, parentColumnSet);
     }
 
     @Override
     public Vector getColumnValue(Document doc) throws NotesException {
         Vector v = super.getColumnValue(doc);
-        long workDays = ((Long) v.get(0)) / 480;    // 60 min per 1 hour and 8 working hours a day
-        Vector<Long> vr = new Vector<Long>(1);
-        vr.add(workDays);
-        return vr;
+        double val = ((Long) v.get(0)).doubleValue() / TimeDiffHelper.MINUTES_PER_WORKING_DAY;
+        Vector<Double> v1 = new Vector<Double>();
+        v1.add(val);
+        return v1;
     }
-
 }

@@ -19,9 +19,9 @@ import lotus.domino.NotesException;
  */
 public abstract class AbstructReportBuilder {
 
-	private LNAgentBase agentBase = null;
+	protected LNAgentBase agentBase = null;
 	
-	private String sRepName = "";
+	protected String sRepName = "";
 
 	protected String sRepTitle = "";
 

@@ -3,6 +3,8 @@ package com.fuib.lotus.agents.params.values.util;
 import java.util.Date;
 
 public class TimeDiffHelper {
+    public static final int MINUTES_PER_WORKING_DAY = 480;  // 60 min per 1 hour and 8 working hours a day
+
     public static long calculateTimeInMinutes(long startTime, long endTime) {
         return Math.abs(endTime - startTime) / (1000 * 60);
     }

@@ -1,6 +1,7 @@
 package com.fuib.lotus.agents.params.values;
 
 import com.fuib.lotus.LNEnvironment;
+import com.fuib.lotus.agents.params.ParamDocColSet;
 import com.fuib.util.WorkTimeBetweenTwoDates;
 import lotus.domino.Document;
 import lotus.domino.NotesException;
@@ -14,11 +15,16 @@ public abstract class AbstractColumnValue {
     protected final String colValue;
     protected LNEnvironment env;
     protected WorkTimeBetweenTwoDates datesDiff;
-    protected Map<String, lotus.domino.Base> baseMap;
     protected List<Database> targetDatabases;
+    protected ParamDocColSet parent;
 
-    public AbstractColumnValue(String value) {
+    public AbstractColumnValue(String value, ParamDocColSet parent) {
         colValue = value;
+        this.parent = parent;
+    }
+
+    public ParamDocColSet getParent() {
+        return parent;
     }
 
     public abstract Vector getColumnValue(Document doc) throws NotesException;
@@ -41,13 +47,5 @@ public abstract class AbstractColumnValue {
 
     public void setDatesDiff(WorkTimeBetweenTwoDates datesDiff) {
         this.datesDiff = datesDiff;
-    }
-
-    public Map<String, lotus.domino.Base> getBaseMap() {
-        return baseMap;
-    }
-
-    public void setBaseMap(Map<String, lotus.domino.Base> baseMap) {
-        this.baseMap = baseMap;
     }
 }

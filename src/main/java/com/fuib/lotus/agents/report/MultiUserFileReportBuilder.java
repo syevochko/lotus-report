@@ -22,7 +22,7 @@ import lotus.domino.NotesException;
  */
 public class MultiUserFileReportBuilder extends AbstructFileReportBuilder {
 
-	private HashMap<String, File> repFiles = new HashMap<String, File>();
+	protected HashMap<String, File> repFiles = new HashMap<String, File>();
 
 	public HashMap<String, File> getRepFiles() {
 		return repFiles;

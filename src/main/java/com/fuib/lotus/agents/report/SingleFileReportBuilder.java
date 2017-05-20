@@ -85,8 +85,7 @@ public class SingleFileReportBuilder extends AbstructFileReportBuilder {
 			return fReport;
 		}
 	}
-	
-	
+
 	/**
 	 * @author evochko 
 	 * @Description финализатор на тот случай, если забыли явно вызвать close() при использовании класса

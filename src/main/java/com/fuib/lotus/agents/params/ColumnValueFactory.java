@@ -9,12 +9,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ColumnValueFactory {
-    private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{(\\w+)\\s*(.*)\\}");
+    private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{([\\w.]+)\\s*(.*)\\}");
 
-    public static AbstractColumnValue getColumnObject(String sColumnValue) {
+    public static AbstractColumnValue getColumnObject(String sColumnValue, ParamDocColSet parent) {
         if (sColumnValue.startsWith("@")) {
             if (sColumnValue.length() > 1) {
-                return new FormulaValue(sColumnValue);
+                return new FormulaValue(sColumnValue, parent);
             }
 
         } else if (sColumnValue.startsWith("#{")) {
@@ -27,14 +27,14 @@ public class ColumnValueFactory {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    return new UndefineValue(sColumnValue + " " + e.getMessage());
+                    return new UndefineValue(sColumnValue + " " + e.getMessage(), parent);
                 }
             }
 
         } else {
-            return new FieldValue(sColumnValue);
+            return new FieldValue(sColumnValue, parent);
         }
 
-        return new UndefineValue(sColumnValue);
+        return new UndefineValue(sColumnValue, parent);
     }
 }
