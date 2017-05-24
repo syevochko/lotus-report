@@ -39,7 +39,7 @@ public class WorkTimeDaysSimpleDiffValue extends WorkTimeDiffMinuteValue {
         } else {
             Vector vd1 = FormulaValue.evaluateFormula(d1Formula, doc);
             Vector vd2 = FormulaValue.evaluateFormula(d2Formula, doc);
-            double totalDaysAmount = (calculateDatesDifference(((DateTime) vd1.get(0)).toJavaDate(), ((DateTime) vd2.get(0)).toJavaDate())) / TimeDiffHelper.MINUTES_PER_WORKING_DAY;
+            double totalDaysAmount = ((Long)(calculateDatesDifference(((DateTime) vd1.get(0)).toJavaDate(), ((DateTime) vd2.get(0)).toJavaDate()))).doubleValue() / TimeDiffHelper.MINUTES_PER_WORKING_DAY;
             v.add(totalDaysAmount);
         }
         return v;

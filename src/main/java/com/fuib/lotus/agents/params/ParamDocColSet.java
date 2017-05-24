@@ -23,7 +23,7 @@ import java.util.*;
 public class ParamDocColSet {
 
     private static final String PARAM_COL_PREFIX = "COL";
-    private static final int MAX_COL_COUNT = 100;
+    private static final int MAX_COL_COUNT = 200;
     private static final String COL_SEP = ";";
     private static final String PARAM_COLS_HAS_SQLNULL = "COLS_HAS_SQLNULL";
 

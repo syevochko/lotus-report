@@ -64,7 +64,8 @@ public class CrfunCsvDashboard extends LNAgentCSVFileBase {
                     Document doc = createSearchResultDoc(dbSearch, fileCsv);
                     rtItem = docFile.createRichTextItem("Body");
                     rtItem.appendText("Отчет " + fileCsv.getName() + " в линкованном документе, в базе ДО: Поиск документов: ");
-                    rtItem.appendDocLink(doc);
+                    rtItem.addNewLine();
+                    rtItem.appendText(doc.getNotesURL());
                     docFile.send(false, m_session.getUserName());
 
                     doc.recycle();
@@ -128,19 +129,6 @@ public class CrfunCsvDashboard extends LNAgentCSVFileBase {
 
         final SimpleDateFormat oFileNameFormatter = new SimpleDateFormat("yyyy-MM-ddHHmmss");
         ((SingleFileReportBuilder) getRepBuilder()).setReportFileName(m_mapConfig.get(PARAM_FILE_PREFIX) + oFileNameFormatter.format(new Date()));
-    }
-
-    @Override
-    protected String[] getTargetDbPaths() {
-    	   String[] dbPaths = new String[3];
-           try {
-               dbPaths[0] = m_env.getWFDbPath("DB_CASH");
-               dbPaths[1] = m_env.getWFDbPath("DB_CASH2");
-               dbPaths[2] = m_env.getWFDbPath("ARCH_WFCASH");
-           } catch (NotesException e) {
-               e.printStackTrace();
-           }
-           return dbPaths;
     }
 
     private List<Database> getTargetDBs() throws NotesException {
