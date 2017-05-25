@@ -11,6 +11,10 @@ import java.util.regex.Pattern;
 public class ColumnValueFactory {
     private static final Pattern CLASS_PATTERN = Pattern.compile("#\\{([\\w.]+)\\s*(.*)\\}");
 
+    public static void main(String[] args) {
+        System.out.println(AbstractColumnValue.class.getPackage().getName());
+    }
+
     public static AbstractColumnValue getColumnObject(String sColumnValue, ParamDocColSet parent) {
         if (sColumnValue.startsWith("@")) {
             if (sColumnValue.length() > 1) {
@@ -21,7 +25,7 @@ public class ColumnValueFactory {
             Matcher m = CLASS_PATTERN.matcher(sColumnValue);
             if (m.matches()) {
                 try {
-                    Class c = Class.forName("com.fuib.lotus.agents.params.values." + m.group(1));
+                    Class c = Class.forName(AbstractColumnValue.class.getPackage().getName() + m.group(1));
                     Object obj = c.getConstructor(String.class, ParamDocColSet.class).newInstance(m.group(2), parent);
                     return (AbstractColumnValue) obj;
 
