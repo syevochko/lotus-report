@@ -2,7 +2,6 @@ package com.fuib.lotus.agents.report.params.values;
 
 import com.fuib.lotus.agents.report.params.ParamDocColSet;
 import com.fuib.lotus.agents.report.params.values.util.TimeDiffHelper;
-
 import lotus.domino.DateTime;
 import lotus.domino.Document;
 import lotus.domino.NotesException;
@@ -38,8 +37,12 @@ public class WorkTimeDaysSimpleDiffValue extends WorkTimeDiffMinuteValue {
         } else {
             Vector vd1 = FormulaValue.evaluateFormula(d1Formula, doc);
             Vector vd2 = FormulaValue.evaluateFormula(d2Formula, doc);
-            double totalDaysAmount = ((Long)(calculateDatesDifference(((DateTime) vd1.get(0)).toJavaDate(), ((DateTime) vd2.get(0)).toJavaDate()))).doubleValue() / TimeDiffHelper.MINUTES_PER_WORKING_DAY;
-            v.add(totalDaysAmount);
+            if (vd1.get(0) instanceof DateTime && vd2.get(0) instanceof DateTime) {
+                double totalDaysAmount = ((Long) (calculateDatesDifference(((DateTime) vd1.get(0)).toJavaDate(), ((DateTime) vd2.get(0)).toJavaDate()))).doubleValue() / TimeDiffHelper.MINUTES_PER_WORKING_DAY;
+                v.add(totalDaysAmount);
+            } else {
+                v.add("Can't get DateTime of {" + d1Formula + ", " + d2Formula + "} for " + doc.getUniversalID());
+            }
         }
         return v;
     }
